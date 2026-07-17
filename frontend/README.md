@@ -22,7 +22,11 @@ npm run dev
 VITE_API_BASE_URL=http://127.0.0.1:8000
 VITE_USE_MOCK_API=true
 VITE_REQUEST_TIMEOUT_MS=15000
+VITE_MOCK_DELAY_MS=450
 ```
+
+`VITE_USE_MOCK_API=true` 时使用与真实接口同契约的运行时 Mock；关闭后请求
+`VITE_API_BASE_URL` 指向的 FastAPI。`VITE_MOCK_DELAY_MS` 用于保留可观察的加载状态。
 
 模型和 Embedding 密钥只应配置在后端，不得写入前端环境变量。
 
@@ -38,6 +42,13 @@ npm run preview
 
 `npm run check` 会依次执行类型检查、静态检查和生产构建。
 
+## API 服务边界
+
+页面和功能模块应从 `src/services/serviceFactory.ts` 使用 `projectService`、
+`indexService` 和 `chatService`，不得直接调用 `fetch`。服务层统一处理 JSON、超时、
+主动取消和后端错误，并通过环境变量在真实 API 与 Mock 间切换。
+
 ## 当前阶段
 
-P0 工程初始化已完成。正式工作台视觉、功能组件和 API 服务将在后续阶段实现。
+P0 工程初始化、P1 应用外壳和 P2 类型化 API/Mock 服务基线已完成。完整项目加载、
+索引构建和问答状态流将在后续阶段接入页面。
