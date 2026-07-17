@@ -1,0 +1,166 @@
+.project-panel {
+  min-width: 0;
+  padding: var(--space-10) var(--space-8);
+  background: var(--color-surface-subtle);
+  border-right: 1px solid var(--color-border);
+}
+
+.workflow-steps {
+  max-width: 20rem;
+  margin: 0 auto;
+  padding: 0;
+  list-style: none;
+}
+
+.workflow-step {
+  position: relative;
+  display: grid;
+  grid-template-columns: 2.5rem minmax(0, 1fr);
+  column-gap: var(--space-4);
+  padding-bottom: var(--space-10);
+}
+
+.workflow-step:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  top: 2.5rem;
+  bottom: 0;
+  left: calc(1.25rem - 0.5px);
+  width: 1px;
+  background: var(--color-border);
+}
+
+.workflow-step--complete:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  z-index: 1;
+  top: 2.5rem;
+  left: calc(1.25rem - 0.5px);
+  width: 1px;
+  height: 2.25rem;
+  background: var(--color-primary);
+}
+
+.workflow-step__marker {
+  position: relative;
+  z-index: 1;
+  width: 2.5rem;
+  height: 2.5rem;
+  display: grid;
+  place-items: center;
+  color: #ffffff;
+  background: var(--color-primary);
+  border-radius: 50%;
+  font-size: 1rem;
+  font-weight: 750;
+  box-shadow: 0 0 0 5px var(--color-surface-subtle);
+}
+
+.workflow-step__marker--check svg {
+  width: 1.4rem;
+  height: 1.4rem;
+}
+
+.workflow-step__body {
+  min-width: 0;
+}
+
+.workflow-step__body > h2 {
+  min-height: 2.5rem;
+  display: flex;
+  align-items: center;
+  margin: 0 0 var(--space-4);
+  font-size: 1.18rem;
+  line-height: 1.35;
+  letter-spacing: -0.02em;
+}
+
+.project-form,
+.index-status {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.project-summary {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-4);
+  margin-top: var(--space-5);
+  padding: var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-panel);
+}
+
+.project-summary__icon {
+  width: 2.8rem;
+  height: 2.8rem;
+  color: var(--color-text);
+}
+
+.project-summary h3,
+.project-summary p {
+  overflow-wrap: anywhere;
+}
+
+.project-summary h3 {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.35;
+}
+
+.project-summary p {
+  margin: var(--space-1) 0 0;
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+}
+
+.index-status__action {
+  width: 100%;
+}
+
+@media (max-width: 960px) {
+  .project-panel {
+    padding: var(--space-8);
+    border-right: 0;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .workflow-steps {
+    max-width: 46rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .project-panel {
+    padding: var(--space-6) var(--space-4);
+  }
+
+  .workflow-step {
+    grid-template-columns: 2.25rem minmax(0, 1fr);
+    column-gap: var(--space-3);
+    padding-bottom: var(--space-8);
+  }
+
+  .workflow-step:not(:last-child)::after {
+    top: 2.25rem;
+    left: calc(1.125rem - 0.5px);
+  }
+
+  .workflow-step--complete:not(:last-child)::before {
+    top: 2.25rem;
+    left: calc(1.125rem - 0.5px);
+  }
+
+  .workflow-step__marker {
+    width: 2.25rem;
+    height: 2.25rem;
+  }
+
+  .workflow-step__body > h2 {
+    min-height: 2.25rem;
+    font-size: 1.08rem;
+  }
+}

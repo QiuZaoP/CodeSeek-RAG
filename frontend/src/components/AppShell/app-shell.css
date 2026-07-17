@@ -1,0 +1,15 @@
+.app-shell {
+  min-height: 100svh;
+  background: var(--color-background);
+}
+
+.page-container {
+  width: min(100% - (2 * var(--space-8)), var(--content-max));
+  margin-inline: auto;
+}
+
+@media (max-width: 640px) {
+  .page-container {
+    width: min(100% - (2 * var(--space-4)), var(--content-max));
+  }
+}

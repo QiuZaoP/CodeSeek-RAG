@@ -1,0 +1,144 @@
+.source-section {
+  margin-top: var(--space-6);
+}
+
+.source-section > h2 {
+  margin: 0 0 var(--space-3);
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+.source-citation {
+  overflow: hidden;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-panel);
+  box-shadow: var(--shadow-subtle);
+}
+
+.source-citation__summary {
+  width: 100%;
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: 0 var(--space-4);
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: 0;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.source-citation__summary:hover {
+  background: var(--color-surface-subtle);
+}
+
+.source-citation__summary:focus-visible {
+  position: relative;
+  z-index: 1;
+  outline: none;
+  box-shadow: inset var(--focus-ring);
+}
+
+.source-citation__path,
+.source-citation__meta {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.source-citation__path {
+  font-family: var(--font-mono);
+  overflow-wrap: anywhere;
+}
+
+.source-citation__path svg,
+.source-citation__chevron {
+  width: 1.25rem;
+  height: 1.25rem;
+  flex: 0 0 auto;
+}
+
+.source-citation__meta {
+  flex: 0 0 auto;
+  color: var(--color-text-muted);
+}
+
+.source-citation__chevron {
+  transition: transform var(--duration-medium) ease;
+}
+
+.source-citation--open .source-citation__chevron {
+  transform: rotate(180deg);
+}
+
+.source-citation__content {
+  overflow-x: auto;
+  border-top: 1px solid var(--color-border);
+}
+
+.source-citation pre {
+  min-width: 44rem;
+  margin: 0;
+  padding: var(--space-4) 0;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  line-height: 1.72;
+  tab-size: 2;
+}
+
+.source-citation code {
+  display: grid;
+}
+
+.code-line {
+  min-height: 1.45rem;
+  display: grid;
+  grid-template-columns: 3.6rem 1fr;
+  padding-right: var(--space-6);
+  white-space: pre;
+}
+
+.code-line__number {
+  margin-right: var(--space-4);
+  padding-right: var(--space-3);
+  color: var(--color-text-soft);
+  text-align: right;
+  border-right: 1px solid var(--color-border-subtle);
+  user-select: none;
+}
+
+.code-line b {
+  color: #7c3aed;
+  font-weight: 500;
+}
+
+.code-line em {
+  color: #075bea;
+  font-style: normal;
+}
+
+.code-line i {
+  color: #0f8a3d;
+  font-style: normal;
+}
+
+@media (max-width: 640px) {
+  .source-citation__summary {
+    align-items: flex-start;
+    padding-block: var(--space-3);
+  }
+
+  .source-citation__meta {
+    font-size: 0.78rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .source-citation__chevron {
+    transition: none;
+  }
+}

@@ -1,0 +1,22 @@
+.loading-indicator {
+  width: 1rem;
+  height: 1rem;
+  display: inline-block;
+  flex: 0 0 auto;
+  border: 2px solid color-mix(in srgb, currentColor 28%, transparent);
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: loading-spin 700ms linear infinite;
+}
+
+@keyframes loading-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loading-indicator {
+    animation-duration: 1400ms;
+  }
+}
