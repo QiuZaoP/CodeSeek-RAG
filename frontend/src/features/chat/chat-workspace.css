@@ -74,6 +74,52 @@
   min-width: 0;
 }
 
+.message__answer {
+  white-space: pre-line;
+}
+
+.answer-loading {
+  min-height: 3.25rem;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--color-text-muted);
+}
+
+.no-sources-notice {
+  margin-top: var(--space-5);
+}
+
+.message__body .error-notice {
+  margin-top: 0.3rem;
+}
+
+.demo-questions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.demo-questions button {
+  padding: var(--space-2) var(--space-3);
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
+  border: 1px solid transparent;
+  border-radius: var(--radius-control);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.84rem;
+}
+
+.demo-questions button:hover {
+  border-color: var(--color-primary);
+}
+
+.demo-questions button:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
 .chat-workspace__composer {
   margin-top: var(--space-12);
 }

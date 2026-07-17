@@ -5,12 +5,19 @@ import '@/features/chat/question-composer.css'
 
 interface QuestionComposerProps {
   disabled?: boolean
+  isLoading?: boolean
   value: string
   onChange: (value: string) => void
   onSubmit: () => void
 }
 
-export function QuestionComposer({ disabled = false, onChange, onSubmit, value }: QuestionComposerProps) {
+export function QuestionComposer({
+  disabled = false,
+  isLoading = false,
+  onChange,
+  onSubmit,
+  value,
+}: QuestionComposerProps) {
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     onSubmit()
@@ -30,11 +37,16 @@ export function QuestionComposer({ disabled = false, onChange, onSubmit, value }
         type="text"
         value={value}
         placeholder={disabled ? '索引就绪后可开始提问…' : '输入关于当前代码库的问题…'}
-        disabled={disabled}
+        disabled={disabled || isLoading}
         onChange={(event) => onChange(event.target.value)}
       />
-      <Button className="question-composer__submit" type="submit" disabled={disabled || !value.trim()}>
-        发送
+      <Button
+        className="question-composer__submit"
+        type="submit"
+        disabled={disabled || !value.trim()}
+        isLoading={isLoading}
+      >
+        {isLoading ? '正在回答' : '发送'}
       </Button>
     </form>
   )

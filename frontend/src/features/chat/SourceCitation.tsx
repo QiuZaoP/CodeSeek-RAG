@@ -1,49 +1,50 @@
-import { useState } from 'react'
+import { useId, useState } from 'react'
 
 import { ChevronDownIcon, FileIcon } from '@/components/Icon/Icon'
+import type { SourceCitation as SourceCitationData } from '@/types/api'
 import '@/features/chat/source-citation.css'
 
-export function SourceCitation() {
-  const [isOpen, setIsOpen] = useState(true)
+interface SourceCitationProps {
+  source: SourceCitationData
+  defaultOpen?: boolean
+}
+
+export function SourceCitation({ defaultOpen = false, source }: SourceCitationProps) {
+  const [isOpen, setIsOpen] = useState(defaultOpen)
+  const contentId = useId()
+  const lines = source.content.split('\n')
 
   return (
-    <section className="source-section" aria-labelledby="source-heading">
-      <h2 id="source-heading">引用来源</h2>
-      <div className={`source-citation ${isOpen ? 'source-citation--open' : ''}`}>
-        <button
-          className="source-citation__summary"
-          type="button"
-          aria-expanded={isOpen}
-          aria-controls="source-code"
-          onClick={() => setIsOpen((current) => !current)}
-        >
-          <span className="source-citation__path">
-            <FileIcon />
-            <span>backend/main.py</span>
-          </span>
-          <span className="source-citation__meta">
-            <span>第 1–24 行</span>
-            <ChevronDownIcon className="source-citation__chevron" />
-          </span>
-        </button>
+    <div className={`source-citation ${isOpen ? 'source-citation--open' : ''}`}>
+      <button
+        className="source-citation__summary"
+        type="button"
+        aria-expanded={isOpen}
+        aria-controls={contentId}
+        onClick={() => setIsOpen((current) => !current)}
+      >
+        <span className="source-citation__path">
+          <FileIcon />
+          <span>{source.file_path}</span>
+        </span>
+        <span className="source-citation__meta">
+          <span>第 {source.start_line}–{source.end_line} 行</span>
+          <ChevronDownIcon className="source-citation__chevron" />
+        </span>
+      </button>
 
-        <div className="source-citation__content" id="source-code" hidden={!isOpen}>
-          <pre aria-label="backend/main.py 第 1 到 10 行代码">
-            <code>
-              <span className="code-line"><span className="code-line__number">1</span><span><b>from</b> fastapi <b>import</b> <em>FastAPI</em></span></span>
-              <span className="code-line"><span className="code-line__number">2</span><span><b>from</b> fastapi.middleware.cors <b>import</b> CORSMiddleware</span></span>
-              <span className="code-line"><span className="code-line__number">3</span><span> </span></span>
-              <span className="code-line"><span className="code-line__number">4</span><span><b>from</b> backend.api <b>import</b> router</span></span>
-              <span className="code-line"><span className="code-line__number">5</span><span> </span></span>
-              <span className="code-line"><span className="code-line__number">6</span><span>app = <em>FastAPI</em>(</span></span>
-              <span className="code-line"><span className="code-line__number">7</span><span>    title=<i>&quot;Demo App&quot;</i>,</span></span>
-              <span className="code-line"><span className="code-line__number">8</span><span>    version=<i>&quot;1.0.0&quot;</i>,</span></span>
-              <span className="code-line"><span className="code-line__number">9</span><span>)</span></span>
-              <span className="code-line"><span className="code-line__number">10</span><span> </span></span>
-            </code>
-          </pre>
-        </div>
+      <div className="source-citation__content" id={contentId} hidden={!isOpen}>
+        <pre aria-label={`${source.file_path} 第 ${source.start_line} 到 ${source.end_line} 行代码`}>
+          <code>
+            {lines.map((line, index) => (
+              <span className="code-line" key={`${source.start_line + index}:${line}`}>
+                <span className="code-line__number">{source.start_line + index}</span>
+                <span>{line || ' '}</span>
+              </span>
+            ))}
+          </code>
+        </pre>
       </div>
-    </section>
+    </div>
   )
 }

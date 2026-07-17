@@ -10,7 +10,7 @@ import { waitForMockDelay } from '@/services/mock/delay'
 
 export type MockProjectScenario = 'success' | 'not-found' | 'forbidden' | 'error'
 export type MockIndexScenario = 'building' | 'completed' | 'failed'
-export type MockChatScenario = 'with-sources' | 'without-sources' | 'error'
+export type MockChatScenario = 'with-sources' | 'without-sources' | 'error' | 'timeout'
 
 export interface MockServiceOptions {
   delayMs?: number
@@ -42,14 +42,21 @@ const MOCK_FILES: ProjectFileSummary[] = [
 ]
 
 const MOCK_CHAT_RESPONSE: ChatResponse = {
-  answer: '项目的后端启动入口位于 backend/main.py。该文件创建 FastAPI 应用并注册 API 路由。',
+  answer:
+    '项目的后端启动入口位于 backend/main.py。该文件创建 FastAPI 应用、注册 API 路由，并由 README 中的 uvicorn 命令启动。',
   sources: [
     {
       file_path: 'backend/main.py',
       start_line: 1,
-      end_line: 10,
+      end_line: 9,
       content:
         'from fastapi import FastAPI\nfrom backend.api import router\n\napp = FastAPI(\n    title="CodeSeek RAG",\n    version="1.0.0",\n)\n\napp.include_router(router)',
+    },
+    {
+      file_path: 'README.md',
+      start_line: 18,
+      end_line: 23,
+      content: '## 后端启动\n\n```bash\npip install -r requirements.txt\nuvicorn backend.main:app --reload\n```',
     },
   ],
 }
@@ -118,6 +125,22 @@ function getIndexScenario(projectId: string, configuredScenario?: MockIndexScena
     return 'failed'
   }
   return 'building'
+}
+
+function getChatScenario(question: string, configuredScenario?: MockChatScenario) {
+  if (configuredScenario) {
+    return configuredScenario
+  }
+  if (question === '模拟无引用回答') {
+    return 'without-sources'
+  }
+  if (question === '模拟问答失败') {
+    return 'error'
+  }
+  if (question === '模拟问答超时') {
+    return 'timeout'
+  }
+  return 'with-sources'
 }
 
 export function createMockServices(options: MockServiceOptions = {}): ServiceBundle {
@@ -218,13 +241,19 @@ export function createMockServices(options: MockServiceOptions = {}): ServiceBun
       },
     },
     chatService: {
-      async askQuestion(_request, requestOptions): Promise<ChatResponse> {
+      async askQuestion(request, requestOptions): Promise<ChatResponse> {
         await waitForMockDelay(delayMs, requestOptions?.signal)
-        const scenario = options.chatScenario ?? 'with-sources'
+        const scenario = getChatScenario(request.question.trim(), options.chatScenario)
         if (scenario === 'error') {
           throw new AppError('问答服务暂时不可用，请稍后重试。', {
             status: 500,
             code: 'CHAT_SERVICE_ERROR',
+            retryable: true,
+          })
+        }
+        if (scenario === 'timeout') {
+          throw new AppError('请求超时，请稍后重试。', {
+            code: 'REQUEST_TIMEOUT',
             retryable: true,
           })
         }

@@ -1,40 +1,20 @@
-import { useState } from 'react'
-
 import { ChatWorkspace } from '@/features/chat/ChatWorkspace'
+import { useChatWorkflow } from '@/features/chat/useChatWorkflow'
 import { useIndexWorkflow } from '@/features/index/useIndexWorkflow'
 import { ProjectPanel } from '@/features/project/ProjectPanel'
 import { useProjectWorkflow } from '@/features/project/useProjectWorkflow'
 import '@/pages/workspace-page.css'
 
 export function WorkspacePage() {
-  const [questionInput, setQuestionInput] = useState('')
-  const [question, setQuestion] = useState<string | undefined>()
-  const [answer, setAnswer] = useState<string | undefined>()
-  function clearConversation() {
-    setQuestionInput('')
-    setQuestion(undefined)
-    setAnswer(undefined)
-  }
-
-  const indexWorkflow = useIndexWorkflow({ onBuildStart: clearConversation })
+  const chatWorkflow = useChatWorkflow()
+  const indexWorkflow = useIndexWorkflow({ onBuildStart: chatWorkflow.reset })
   const projectWorkflow = useProjectWorkflow({
     onProjectChanging: () => {
       indexWorkflow.reset()
-      clearConversation()
+      chatWorkflow.reset()
     },
   })
   const isChatEnabled = indexWorkflow.state.status === 'completed'
-
-  function handleQuestionSubmit() {
-    const normalizedQuestion = questionInput.trim()
-    if (!normalizedQuestion) {
-      return
-    }
-
-    setQuestion(normalizedQuestion)
-    setAnswer('问题已记录。检索与大模型服务将在后续阶段接入。')
-    setQuestionInput('')
-  }
 
   return (
     <div className="workspace-page">
@@ -53,13 +33,23 @@ export function WorkspacePage() {
         }}
       />
       <ChatWorkspace
-        answer={answer}
-        question={question}
-        questionInput={questionInput}
         isEnabled={isChatEnabled}
-        showCitation={false}
-        onQuestionInputChange={setQuestionInput}
-        onQuestionSubmit={handleQuestionSubmit}
+        questionInput={chatWorkflow.questionInput}
+        state={chatWorkflow.state}
+        onQuestionInputChange={chatWorkflow.setQuestionInput}
+        onQuestionSubmit={() => {
+          if (projectWorkflow.project) {
+            void chatWorkflow.askQuestion(projectWorkflow.project.project_id)
+          }
+        }}
+        onRetry={() => {
+          if (projectWorkflow.project && chatWorkflow.state.question) {
+            void chatWorkflow.askQuestion(
+              projectWorkflow.project.project_id,
+              chatWorkflow.state.question,
+            )
+          }
+        }}
       />
     </div>
   )

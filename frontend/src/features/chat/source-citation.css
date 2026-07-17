@@ -8,6 +8,11 @@
   line-height: 1.4;
 }
 
+.source-list {
+  display: grid;
+  gap: var(--space-3);
+}
+
 .source-citation {
   overflow: hidden;
   background: var(--color-surface);
@@ -109,21 +114,6 @@
   text-align: right;
   border-right: 1px solid var(--color-border-subtle);
   user-select: none;
-}
-
-.code-line b {
-  color: #7c3aed;
-  font-weight: 500;
-}
-
-.code-line em {
-  color: #075bea;
-  font-style: normal;
-}
-
-.code-line i {
-  color: #0f8a3d;
-  font-style: normal;
 }
 
 @media (max-width: 640px) {
