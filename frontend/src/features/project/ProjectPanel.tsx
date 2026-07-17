@@ -35,7 +35,10 @@ export function ProjectPanel({
   return (
     <aside className="project-panel" aria-label="项目工作流">
       <ol className="workflow-steps">
-        <li className={`workflow-step ${hasProject ? 'workflow-step--complete' : 'workflow-step--current'}`}>
+        <li
+          className={`workflow-step ${hasProject ? 'workflow-step--complete' : 'workflow-step--current'}`}
+          aria-current={hasProject ? undefined : 'step'}
+        >
           <div className="workflow-step__marker" aria-hidden="true">
             1
           </div>
@@ -52,8 +55,15 @@ export function ProjectPanel({
           </div>
         </li>
 
-        <li className={`workflow-step ${hasIndex ? 'workflow-step--complete' : hasProject ? 'workflow-step--current' : 'workflow-step--inactive'}`}>
-          <div className={`workflow-step__marker ${hasIndex ? 'workflow-step__marker--check' : ''}`} aria-label={hasIndex ? '已完成' : undefined} aria-hidden={hasIndex ? undefined : true}>
+        <li
+          className={`workflow-step ${hasIndex ? 'workflow-step--complete' : hasProject ? 'workflow-step--current' : 'workflow-step--inactive'}`}
+          aria-current={hasProject && !hasIndex ? 'step' : undefined}
+        >
+          <div
+            className={`workflow-step__marker ${hasIndex ? 'workflow-step__marker--check' : ''}`}
+            aria-label={hasIndex ? '已完成' : undefined}
+            aria-hidden={hasIndex ? undefined : true}
+          >
             {hasIndex ? <CheckIcon /> : 2}
           </div>
           <div className="workflow-step__body">
@@ -62,7 +72,10 @@ export function ProjectPanel({
           </div>
         </li>
 
-        <li className={`workflow-step ${hasIndex ? 'workflow-step--current' : 'workflow-step--inactive'}`} aria-current={hasIndex ? 'step' : undefined}>
+        <li
+          className={`workflow-step ${hasIndex ? 'workflow-step--current' : 'workflow-step--inactive'}`}
+          aria-current={hasIndex ? 'step' : undefined}
+        >
           <div className="workflow-step__marker" aria-hidden="true">
             3
           </div>

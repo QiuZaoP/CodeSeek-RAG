@@ -31,7 +31,7 @@ export function ChatWorkspace({
   const isLoading = state.status === 'loading'
 
   return (
-    <main className="chat-workspace">
+    <main className="chat-workspace" id="main-content" tabIndex={-1}>
       <div className="chat-workspace__content">
         <h1>询问你的代码库</h1>
 

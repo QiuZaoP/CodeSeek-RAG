@@ -5,9 +5,9 @@ import '@/pages/content-page.css'
 
 export function NotFoundPage() {
   return (
-    <main className="content-page page-container">
+    <main className="content-page page-container" id="main-content" tabIndex={-1}>
       <EmptyState
-        title="页面不存在"
+        title="404：页面不存在"
         action={
           <NavLink className="button button--primary" to="/workspace">
             返回工作台

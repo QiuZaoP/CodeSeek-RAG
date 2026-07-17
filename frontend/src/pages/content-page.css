@@ -21,6 +21,34 @@
   line-height: 1.75;
 }
 
+.content-page__header .content-page__eyebrow {
+  margin: 0 0 var(--space-3);
+  color: var(--color-primary);
+  font-size: 0.82rem;
+  font-weight: 750;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.guide-section {
+  max-width: 58rem;
+  padding-block: var(--space-8);
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.guide-section > h2 {
+  margin: 0;
+  font-size: 1.45rem;
+  letter-spacing: -0.025em;
+}
+
+.guide-section > p {
+  max-width: 46rem;
+  margin: var(--space-3) 0 0;
+  color: var(--color-text-muted);
+  line-height: 1.7;
+}
+
 .guide-steps {
   max-width: 44rem;
   display: grid;
@@ -49,7 +77,7 @@
   font-weight: 750;
 }
 
-.guide-steps h2 {
+.guide-steps h3 {
   margin: 0;
   font-size: 1.08rem;
 }
@@ -61,11 +89,113 @@
 }
 
 .content-page__action {
+  margin-top: var(--space-8);
   text-decoration: none;
+}
+
+.guide-card-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-4);
+  margin-top: var(--space-5);
+}
+
+.guide-card {
+  min-width: 0;
+  padding: var(--space-5);
+  background: var(--color-surface-subtle);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-panel);
+}
+
+.guide-card h3,
+.troubleshooting-list h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.guide-card p,
+.troubleshooting-list p {
+  margin: var(--space-3) 0 0;
+  color: var(--color-text-muted);
+  line-height: 1.65;
+}
+
+.guide-card pre {
+  overflow-x: auto;
+  margin: var(--space-4) 0 0;
+  padding: var(--space-3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-control);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  line-height: 1.6;
+}
+
+.scenario-list {
+  display: grid;
+  gap: 0;
+  margin: var(--space-5) 0 0;
+}
+
+.scenario-list > div {
+  display: grid;
+  grid-template-columns: minmax(12rem, 0.8fr) minmax(0, 1fr);
+  gap: var(--space-5);
+  padding-block: var(--space-3);
+  border-top: 1px solid var(--color-border-subtle);
+}
+
+.scenario-list dt,
+.scenario-list dd {
+  min-width: 0;
+  margin: 0;
+}
+
+.scenario-list code {
+  overflow-wrap: anywhere;
+  color: var(--color-primary);
+  font-family: var(--font-mono);
+}
+
+.scenario-list dd {
+  color: var(--color-text-muted);
+}
+
+.troubleshooting-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-6);
+  margin-top: var(--space-5);
 }
 
 @media (max-width: 640px) {
   .content-page {
     padding-block: var(--space-10);
+  }
+
+  .guide-section {
+    padding-block: var(--space-6);
+  }
+
+  .guide-card-grid,
+  .troubleshooting-list {
+    grid-template-columns: 1fr;
+  }
+
+  .scenario-list > div {
+    grid-template-columns: 1fr;
+    gap: var(--space-1);
+  }
+}
+
+@media (min-width: 641px) and (max-width: 900px) {
+  .guide-card-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .troubleshooting-list {
+    grid-template-columns: 1fr;
   }
 }

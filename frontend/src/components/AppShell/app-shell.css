@@ -3,6 +3,25 @@
   background: var(--color-background);
 }
 
+.skip-link {
+  position: fixed;
+  z-index: 100;
+  top: var(--space-3);
+  left: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  color: #ffffff;
+  background: var(--color-primary);
+  border-radius: var(--radius-control);
+  box-shadow: var(--shadow-subtle);
+  font-weight: 700;
+  text-decoration: none;
+  transform: translateY(calc(-100% - var(--space-6)));
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
 .page-container {
   width: min(100% - (2 * var(--space-8)), var(--content-max));
   margin-inline: auto;
