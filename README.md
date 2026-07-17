@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 @'
 # CodeSeek-RAG
 
@@ -21,3 +22,6 @@
 ```bash
 pip install -r requirements.txt
 uvicorn backend.main:app --reload
+=======
+# CodeSeek-RAG
+>>>>>>> 99a08916743003e6fb8bfc97bca8a6543f691db5
