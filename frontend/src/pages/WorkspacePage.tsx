@@ -1,6 +1,7 @@
 import { useState } from 'react'
 
 import { ChatWorkspace } from '@/features/chat/ChatWorkspace'
+import { useIndexWorkflow } from '@/features/index/useIndexWorkflow'
 import { ProjectPanel } from '@/features/project/ProjectPanel'
 import { useProjectWorkflow } from '@/features/project/useProjectWorkflow'
 import '@/pages/workspace-page.css'
@@ -9,13 +10,20 @@ export function WorkspacePage() {
   const [questionInput, setQuestionInput] = useState('')
   const [question, setQuestion] = useState<string | undefined>()
   const [answer, setAnswer] = useState<string | undefined>()
+  function clearConversation() {
+    setQuestionInput('')
+    setQuestion(undefined)
+    setAnswer(undefined)
+  }
+
+  const indexWorkflow = useIndexWorkflow({ onBuildStart: clearConversation })
   const projectWorkflow = useProjectWorkflow({
     onProjectChanging: () => {
-      setQuestionInput('')
-      setQuestion(undefined)
-      setAnswer(undefined)
+      indexWorkflow.reset()
+      clearConversation()
     },
   })
+  const isChatEnabled = indexWorkflow.state.status === 'completed'
 
   function handleQuestionSubmit() {
     const normalizedQuestion = questionInput.trim()
@@ -32,17 +40,23 @@ export function WorkspacePage() {
     <div className="workspace-page">
       <ProjectPanel
         error={projectWorkflow.error}
+        indexState={indexWorkflow.state}
         project={projectWorkflow.project}
         projectPath={projectWorkflow.projectPath}
         status={projectWorkflow.status}
         onPathChange={projectWorkflow.setProjectPath}
         onLoadProject={projectWorkflow.loadProject}
+        onBuildIndex={() => {
+          if (projectWorkflow.project) {
+            void indexWorkflow.buildIndex(projectWorkflow.project.project_id)
+          }
+        }}
       />
       <ChatWorkspace
         answer={answer}
         question={question}
         questionInput={questionInput}
-        isEnabled={false}
+        isEnabled={isChatEnabled}
         showCitation={false}
         onQuestionInputChange={setQuestionInput}
         onQuestionSubmit={handleQuestionSubmit}

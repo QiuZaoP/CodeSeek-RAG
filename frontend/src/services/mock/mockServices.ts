@@ -107,6 +107,19 @@ function getProjectScenario(projectPath: string, configuredScenario?: MockProjec
   return 'success'
 }
 
+function getIndexScenario(projectId: string, configuredScenario?: MockIndexScenario) {
+  if (configuredScenario) {
+    return configuredScenario
+  }
+  if (projectId === 'mock-index-complete') {
+    return 'completed'
+  }
+  if (projectId === 'mock-index-failure') {
+    return 'failed'
+  }
+  return 'building'
+}
+
 export function createMockServices(options: MockServiceOptions = {}): ServiceBundle {
   const delayMs = options.delayMs ?? 450
   const pollsBeforeCompletion = Math.max(1, options.pollsBeforeIndexCompletion ?? 2)
@@ -141,7 +154,7 @@ export function createMockServices(options: MockServiceOptions = {}): ServiceBun
     indexService: {
       async buildIndex(request, requestOptions): Promise<IndexStatusResponse> {
         await waitForMockDelay(delayMs, requestOptions?.signal)
-        const scenario = options.indexScenario ?? 'building'
+        const scenario = getIndexScenario(request.project_id, options.indexScenario)
         if (scenario === 'failed') {
           const response: IndexStatusResponse = {
             project_id: request.project_id,

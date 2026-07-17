@@ -96,6 +96,14 @@
   width: 100%;
 }
 
+.index-status .error-notice {
+  padding: var(--space-4);
+}
+
+.index-status .error-notice__body {
+  font-size: 0.84rem;
+}
+
 .project-summary {
   min-width: 0;
   display: grid;

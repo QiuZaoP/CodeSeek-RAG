@@ -46,7 +46,7 @@ export function ChatWorkspace({
             </div>
           </article>
         </section> : (
-          <EmptyState title="等待开始问答">
+          <EmptyState title={isEnabled ? '开始提问' : '等待开始问答'}>
             {isEnabled ? '输入一个关于当前代码库的问题。' : '加载项目并建立索引后，即可开始代码问答。'}
           </EmptyState>
         )}
