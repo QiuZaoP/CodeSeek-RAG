@@ -1,5 +1,4 @@
-﻿@'
-.venv/
+﻿.venv/
 venv/
 __pycache__/
 *.pyc
@@ -10,4 +9,3 @@ node_modules/
 dist/
 .vscode/
 .idea/
-'@ | Set-Content -Encoding utf8 .gitignore
