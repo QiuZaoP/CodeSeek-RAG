@@ -28,6 +28,15 @@ VITE_MOCK_DELAY_MS=450
 `VITE_USE_MOCK_API=true` 时使用与真实接口同契约的运行时 Mock；关闭后请求
 `VITE_API_BASE_URL` 指向的 FastAPI。`VITE_MOCK_DELAY_MS` 用于保留可观察的加载状态。
 
+真实模式还需要在项目根目录启动后端：
+
+```bash
+pip install -r requirements.txt
+uvicorn backend.main:app --reload
+```
+
+后端需允许当前前端开发地址通过 CORS 访问。
+
 模型和 Embedding 密钥只应配置在后端，不得写入前端环境变量。
 
 ## 质量命令

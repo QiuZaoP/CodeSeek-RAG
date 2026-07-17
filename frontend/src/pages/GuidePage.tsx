@@ -63,7 +63,10 @@ export function GuidePage() {
           <article className="guide-card">
             <h3>真实后端模式</h3>
             <pre><code>VITE_USE_MOCK_API=false{`\n`}VITE_API_BASE_URL=http://127.0.0.1:8000</code></pre>
-            <p>需要先启动 FastAPI，并允许前端开发地址通过 CORS 访问。</p>
+            <p>
+              先在项目根目录执行 <code>pip install -r requirements.txt</code>，再执行{' '}
+              <code>uvicorn backend.main:app --reload</code>，并允许前端开发地址通过 CORS 访问。
+            </p>
           </article>
         </div>
       </section>
