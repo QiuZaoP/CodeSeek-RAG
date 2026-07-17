@@ -1,0 +1,10 @@
+@'
+fastapi
+uvicorn[standard]
+python-dotenv
+pydantic
+chromadb
+sentence-transformers
+openai
+pytest
+'@ | Set-Content -Encoding utf8 requirements.txt

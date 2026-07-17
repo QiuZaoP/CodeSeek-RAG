@@ -1,0 +1,13 @@
+﻿@'
+.venv/
+venv/
+__pycache__/
+*.pyc
+.env
+data/
+chroma_db/
+node_modules/
+dist/
+.vscode/
+.idea/
+'@ | Set-Content -Encoding utf8 .gitignore
