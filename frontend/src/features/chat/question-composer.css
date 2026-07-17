@@ -14,6 +14,11 @@
   box-shadow: var(--focus-ring), var(--shadow-subtle);
 }
 
+.question-composer--disabled {
+  border-color: var(--color-border);
+  box-shadow: none;
+}
+
 .question-composer__label {
   position: absolute;
   width: 1px;

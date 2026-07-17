@@ -2,24 +2,20 @@ import { Button } from '@/components/Button/Button'
 import { StatusMessage } from '@/components/StatusMessage/StatusMessage'
 
 interface IndexStatusProps {
-  isBuilding: boolean
-  onRebuild: () => void
+  hasProject: boolean
 }
 
-export function IndexStatus({ isBuilding, onRebuild }: IndexStatusProps) {
+export function IndexStatus({ hasProject }: IndexStatusProps) {
   return (
     <div className="index-status">
-      <StatusMessage variant={isBuilding ? 'neutral' : 'success'}>
-        {isBuilding ? '正在建立索引…' : '索引已就绪'}
-      </StatusMessage>
+      <StatusMessage>{hasProject ? '项目已就绪，等待建立索引' : '请先加载项目'}</StatusMessage>
       <Button
         className="index-status__action"
         type="button"
         variant="secondary"
-        isLoading={isBuilding}
-        onClick={onRebuild}
+        disabled
       >
-        重新建立索引
+        建立索引
       </Button>
     </div>
   )

@@ -1,19 +1,22 @@
 import { BotIcon, UserIcon } from '@/components/Icon/Icon'
+import { EmptyState } from '@/components/EmptyState/EmptyState'
 import { QuestionComposer } from '@/features/chat/QuestionComposer'
 import { SourceCitation } from '@/features/chat/SourceCitation'
 import '@/features/chat/chat-workspace.css'
 
 interface ChatWorkspaceProps {
-  answer: string
-  question: string
+  answer?: string
+  question?: string
   questionInput: string
   showCitation: boolean
+  isEnabled: boolean
   onQuestionInputChange: (value: string) => void
   onQuestionSubmit: () => void
 }
 
 export function ChatWorkspace({
   answer,
+  isEnabled,
   onQuestionInputChange,
   onQuestionSubmit,
   question,
@@ -25,7 +28,7 @@ export function ChatWorkspace({
       <div className="chat-workspace__content">
         <h1>询问你的代码库</h1>
 
-        <section className="conversation" aria-label="代码库问答">
+        {question && answer ? <section className="conversation" aria-label="代码库问答">
           <article className="message message--user">
             <div className="message__avatar message__avatar--user" aria-hidden="true">
               <UserIcon />
@@ -42,11 +45,16 @@ export function ChatWorkspace({
               {showCitation ? <SourceCitation /> : null}
             </div>
           </article>
-        </section>
+        </section> : (
+          <EmptyState title="等待开始问答">
+            {isEnabled ? '输入一个关于当前代码库的问题。' : '加载项目并建立索引后，即可开始代码问答。'}
+          </EmptyState>
+        )}
       </div>
 
       <div className="chat-workspace__composer">
         <QuestionComposer
+          disabled={!isEnabled}
           value={questionInput}
           onChange={onQuestionInputChange}
           onSubmit={onQuestionSubmit}

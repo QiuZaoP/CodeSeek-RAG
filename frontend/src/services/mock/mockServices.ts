@@ -91,6 +91,22 @@ function createProjectError(scenario: Exclude<MockProjectScenario, 'success'>) {
   })
 }
 
+function getProjectScenario(projectPath: string, configuredScenario?: MockProjectScenario) {
+  if (configuredScenario) {
+    return configuredScenario
+  }
+  if (projectPath === 'mock://missing-project') {
+    return 'not-found'
+  }
+  if (projectPath === 'mock://forbidden-project') {
+    return 'forbidden'
+  }
+  if (projectPath === 'mock://service-error') {
+    return 'error'
+  }
+  return 'success'
+}
+
 export function createMockServices(options: MockServiceOptions = {}): ServiceBundle {
   const delayMs = options.delayMs ?? 450
   const pollsBeforeCompletion = Math.max(1, options.pollsBeforeIndexCompletion ?? 2)
@@ -109,7 +125,7 @@ export function createMockServices(options: MockServiceOptions = {}): ServiceBun
             retryable: false,
           })
         }
-        const scenario = options.projectScenario ?? 'success'
+        const scenario = getProjectScenario(projectPath, options.projectScenario)
         if (scenario !== 'success') {
           throw createProjectError(scenario)
         }

@@ -4,19 +4,23 @@ import { Button } from '@/components/Button/Button'
 import '@/features/chat/question-composer.css'
 
 interface QuestionComposerProps {
+  disabled?: boolean
   value: string
   onChange: (value: string) => void
   onSubmit: () => void
 }
 
-export function QuestionComposer({ onChange, onSubmit, value }: QuestionComposerProps) {
+export function QuestionComposer({ disabled = false, onChange, onSubmit, value }: QuestionComposerProps) {
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     onSubmit()
   }
 
   return (
-    <form className="question-composer" onSubmit={handleSubmit}>
+    <form
+      className={`question-composer ${disabled ? 'question-composer--disabled' : ''}`}
+      onSubmit={handleSubmit}
+    >
       <label className="question-composer__label" htmlFor="codebase-question">
         输入关于当前代码库的问题
       </label>
@@ -25,10 +29,11 @@ export function QuestionComposer({ onChange, onSubmit, value }: QuestionComposer
         name="question"
         type="text"
         value={value}
-        placeholder="输入关于当前代码库的问题…"
+        placeholder={disabled ? '索引就绪后可开始提问…' : '输入关于当前代码库的问题…'}
+        disabled={disabled}
         onChange={(event) => onChange(event.target.value)}
       />
-      <Button className="question-composer__submit" type="submit" disabled={!value.trim()}>
+      <Button className="question-composer__submit" type="submit" disabled={disabled || !value.trim()}>
         发送
       </Button>
     </form>

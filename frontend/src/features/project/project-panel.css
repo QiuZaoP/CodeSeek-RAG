@@ -61,6 +61,12 @@
   height: 1.4rem;
 }
 
+.workflow-step--inactive .workflow-step__marker {
+  color: var(--color-text-muted);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+}
+
 .workflow-step__body {
   min-width: 0;
 }
@@ -75,10 +81,19 @@
   letter-spacing: -0.02em;
 }
 
+.project-form-stack,
 .project-form,
 .index-status {
   display: grid;
   gap: var(--space-4);
+}
+
+.project-form-stack .error-notice {
+  padding: var(--space-4);
+}
+
+.project-form-stack .error-notice__action .button {
+  width: 100%;
 }
 
 .project-summary {
@@ -100,9 +115,59 @@
   color: var(--color-text);
 }
 
+.project-summary__body {
+  min-width: 0;
+}
+
 .project-summary h3,
 .project-summary p {
   overflow-wrap: anywhere;
+}
+
+.project-summary__files {
+  grid-column: 1 / -1;
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border-subtle);
+}
+
+.project-summary__files summary {
+  color: var(--color-primary);
+  cursor: pointer;
+  font-size: 0.86rem;
+  font-weight: 650;
+}
+
+.project-summary__files ul {
+  display: grid;
+  gap: var(--space-2);
+  margin: var(--space-3) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.project-summary__files li {
+  min-width: 0;
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+}
+
+.project-summary__files li span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.project-summary__files small {
+  flex: 0 0 auto;
+  color: var(--color-text-soft);
+}
+
+.project-summary__files > p {
+  font-size: 0.78rem;
 }
 
 .project-summary h3 {
