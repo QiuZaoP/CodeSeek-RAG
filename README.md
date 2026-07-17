@@ -1,4 +1,3 @@
-@'
 # CodeSeek-RAG
 
 基于 RAG 的代码库智能问答助手。
