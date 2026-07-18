@@ -1,1 +1,1 @@
-"""Backend package for CodeSeek-RAG."""
+"""CodeSeek-RAG backend package."""
