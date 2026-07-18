@@ -14,6 +14,8 @@ npm install
 npm run dev
 ```
 
+锁文件未变化时，也可以使用 `npm ci` 从干净依赖状态安装。
+
 ## 环境变量
 
 复制 `.env.example` 为 `.env.local`，按需调整：
@@ -51,6 +53,13 @@ npm run preview
 
 `npm run check` 会依次执行类型检查、静态检查和生产构建。
 
+生产预览验收：
+
+```bash
+npm run check
+npm run preview
+```
+
 ## API 服务边界
 
 页面和功能模块应从 `src/services/serviceFactory.ts` 使用 `projectService`、
@@ -86,5 +95,6 @@ Mock 模式可使用以下内容验证异常状态：
 
 ## 当前阶段
 
-P0–P6 已完成：工程、应用外壳、类型化 API/Mock、项目加载、索引构建、问答引用、
-使用说明和响应式质量基线均已落地。真实 FastAPI 字段与 CORS 仍需在联调阶段确认。
+P0–P6 已完成。P7 已完成前端契约联调准备：真实 HTTP 模式、四个接口、CORS、异步
+索引轮询、错误响应和引用展示已通过本地契约样例验证。当前仓库仍未包含可运行的团队
+FastAPI 实现，后端合并后需要使用同一流程复核真实字段与 CORS。
