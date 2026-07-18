@@ -1,21 +1,24 @@
 import type { IndexService } from '@/services/contracts'
 import type { HttpClient } from '@/services/httpClient'
+import { validateIndexStatusResponse } from '@/services/responseValidators'
 import type { IndexStatusResponse } from '@/types/api'
 
 export function createIndexService(httpClient: HttpClient): IndexService {
   return {
-    buildIndex(request, options) {
-      return httpClient.request<IndexStatusResponse>('/api/index/build', {
+    async buildIndex(request, options) {
+      const response = await httpClient.request<IndexStatusResponse>('/api/index/build', {
         method: 'POST',
         body: request,
         signal: options?.signal,
       })
+      return validateIndexStatusResponse(response)
     },
-    getIndexStatus(projectId, options) {
+    async getIndexStatus(projectId, options) {
       const query = new URLSearchParams({ project_id: projectId })
-      return httpClient.request<IndexStatusResponse>(`/api/index/status?${query}`, {
+      const response = await httpClient.request<IndexStatusResponse>(`/api/index/status?${query}`, {
         signal: options?.signal,
       })
+      return validateIndexStatusResponse(response)
     },
   }
 }

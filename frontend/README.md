@@ -57,6 +57,20 @@ npm run preview
 `indexService` 和 `chatService`，不得直接调用 `fetch`。服务层统一处理 JSON、超时、
 主动取消和后端错误，并通过环境变量在真实 API 与 Mock 间切换。
 
+真实模式依赖以下接口：
+
+```text
+POST /api/projects/load
+POST /api/index/build
+GET  /api/index/status?project_id=<project_id>
+POST /api/chat
+```
+
+项目、索引和问答响应会在服务层执行运行时契约校验。字段缺失、状态值非法或引用行号
+无效时，页面会显示“数据格式不符合接口约定”，避免未经校验的数据进入组件。后端应
+允许实际前端地址通过 CORS，并允许 `Content-Type` 请求头与 `GET`、`POST`、
+`OPTIONS` 方法。
+
 ## 操作流程
 
 1. 输入项目路径并加载，确认项目 ID 与文件数量。
