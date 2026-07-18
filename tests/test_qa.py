@@ -182,6 +182,29 @@ def test_openai_llm_reports_missing_choices_clearly():
         llm.generate("question")
 
 
+def test_chat_endpoint_maps_provider_exception_to_readable_502():
+    class FailingProviderClient:
+        class chat:
+            class completions:
+                @staticmethod
+                def create(**_kwargs):
+                    raise ValueError("rate limit exceeded")
+
+    llm = OpenAILLM.__new__(OpenAILLM)
+    llm._client = FailingProviderClient()
+    llm._model = "test-model"
+    service = QAService(FakeRetriever([source("src/main.py", 1, 1, "code")]), llm)
+
+    response = make_client(service).post(
+        "/api/chat", json={"project_id": "demo", "question": "entry?"}
+    )
+
+    assert response.status_code == 502
+    assert response.json() == {
+        "detail": "LLM request failed: LLM provider request failed: rate limit exceeded"
+    }
+
+
 def make_client(service: QAService) -> TestClient:
     app = FastAPI()
     app.include_router(create_chat_router(service))

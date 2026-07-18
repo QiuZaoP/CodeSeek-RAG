@@ -52,10 +52,15 @@ class OpenAILLM:
         self._model = model
 
     def generate(self, prompt: str) -> str:
-        response = self._client.chat.completions.create(
-            model=self._model,
-            messages=[{"role": "user", "content": prompt}],
-        )
+        try:
+            response = self._client.chat.completions.create(
+                model=self._model,
+                messages=[{"role": "user", "content": prompt}],
+            )
+        except RuntimeError:
+            raise
+        except Exception as error:
+            raise RuntimeError(f"LLM provider request failed: {error}") from error
         choices = getattr(response, "choices", None)
         if not choices:
             raise RuntimeError("The configured LLM response contained no choices.")
