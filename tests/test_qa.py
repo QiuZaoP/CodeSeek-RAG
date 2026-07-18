@@ -1,4 +1,6 @@
 import pytest
+from fastapi import FastAPI
+from fastapi.testclient import TestClient
 
 from backend.qa.adapters import (
     MockLLM,
@@ -9,6 +11,7 @@ from backend.qa.adapters import (
 )
 from backend.qa.models import SourceChunk
 from backend.qa.service import INSUFFICIENT_EVIDENCE_MESSAGE, QAService
+from backend.api.chat_api import create_chat_router
 
 
 class FakeRetriever:
@@ -170,3 +173,80 @@ def test_openai_llm_reports_missing_choices_clearly():
 
     with pytest.raises(RuntimeError, match="no choices"):
         llm.generate("question")
+
+
+def make_client(service: QAService) -> TestClient:
+    app = FastAPI()
+    app.include_router(create_chat_router(service))
+    return TestClient(app)
+
+
+def test_chat_endpoint_returns_answer_and_exact_sources():
+    service = QAService(
+        FakeRetriever([source("src/main.py", 1, 2, "def main(): pass")]),
+        FakeLLM("grounded answer"),
+    )
+
+    response = make_client(service).post(
+        "/api/chat",
+        json={"project_id": "demo", "question": "entry?", "top_k": 1},
+    )
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "answer": "grounded answer",
+        "sources": [
+            {
+                "file_path": "src/main.py",
+                "start_line": 1,
+                "end_line": 2,
+                "content": "def main(): pass",
+            }
+        ],
+    }
+
+
+@pytest.mark.parametrize(
+    ("payload", "field"),
+    [
+        ({"project_id": "demo", "question": "   "}, "question"),
+        ({"project_id": "demo", "question": "entry?", "top_k": 0}, "top_k"),
+    ],
+)
+def test_chat_endpoint_validates_question_and_top_k(payload: dict[str, object], field: str):
+    response = make_client(QAService(FakeRetriever([]), FakeLLM("unused"))).post(
+        "/api/chat", json=payload
+    )
+
+    assert response.status_code == 422
+    assert response.json()["detail"][0]["loc"][-1] == field
+
+
+def test_chat_endpoint_turns_llm_failure_into_readable_detail():
+    class FailingLLM:
+        def generate(self, prompt: str) -> str:
+            raise RuntimeError("provider unavailable")
+
+    service = QAService(
+        FakeRetriever([source("src/main.py", 1, 1, "code")]), FailingLLM()
+    )
+
+    response = make_client(service).post(
+        "/api/chat", json={"project_id": "demo", "question": "entry?"}
+    )
+
+    assert response.status_code == 502
+    assert response.json() == {"detail": "LLM request failed: provider unavailable"}
+
+
+def test_chat_endpoint_turns_real_adapter_error_into_readable_detail():
+    class MisconfiguredRetriever:
+        def search(self, project_id: str, question: str, top_k: int) -> list[SourceChunk]:
+            raise RealAdapterConfigurationError("real retrieval is not configured")
+
+    response = make_client(QAService(MisconfiguredRetriever(), FakeLLM("unused"))).post(
+        "/api/chat", json={"project_id": "demo", "question": "entry?"}
+    )
+
+    assert response.status_code == 503
+    assert response.json() == {"detail": "QA real-mode configuration error: real retrieval is not configured"}
