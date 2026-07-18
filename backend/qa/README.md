@@ -44,6 +44,29 @@ build `QAService(retriever, llm)`, and include
 and the exact `sources` used. LLM failures return `502`; real adapter setup
 errors return `503`, each with a readable `detail`.
 
+## Demo questions
+
+Use a loaded and indexed demonstration repository, then ask these questions in
+order. The exact files vary by repository; every successful answer must show
+the source entries returned by the API, including relative file path and
+one-based line range.
+
+1. `这个项目的启动入口在哪里？`
+   - Show the answer and the source containing the application entry point.
+2. `用户登录流程是怎样的？`
+   - Show the answer and each authentication-related source used.
+3. `哪个文件负责数据库连接？`
+   - Show the connection/configuration source with its line range.
+4. `这个函数的作用是什么？`
+   - Replace `这个函数` with a function name visible in the loaded repository;
+     show the function definition source.
+5. `这个项目使用了哪些主要技术？`
+   - Show the answer with sources such as `README.md`, dependency manifests,
+     or application configuration.
+
+For a question without supporting chunks, verify that the answer is exactly
+`未在当前代码库中找到足够依据。` and that no unsupported source is displayed.
+
 ## Tests
 
 ```powershell
