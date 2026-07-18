@@ -58,6 +58,17 @@ def test_answer_applies_context_limit_before_adding_each_source():
     assert "b.py:1-1" not in llm.prompts[0]
 
 
+def test_answer_keeps_chunks_with_same_location_and_different_content():
+    retriever = FakeRetriever(
+        [source("a.py", 1, 1, "first version"), source("a.py", 1, 1, "second version")]
+    )
+    llm = FakeLLM("grounded answer")
+
+    result = QAService(retriever, llm).answer("demo", "where?")
+
+    assert [item.content for item in result.sources] == ["first version", "second version"]
+
+
 def test_answer_returns_insufficient_evidence_without_calling_llm():
     llm = FakeLLM("unused")
 
