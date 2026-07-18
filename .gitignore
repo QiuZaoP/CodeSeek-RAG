@@ -11,5 +11,10 @@ data/
 chroma_db/
 node_modules/
 dist/
+mydocs/
+frontend/.local-validation/
+frontend/coverage/
+frontend/playwright-report/
+frontend/test-results/
 .vscode/
 .idea/
