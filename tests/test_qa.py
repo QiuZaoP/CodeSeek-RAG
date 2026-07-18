@@ -87,9 +87,10 @@ def test_answer_prompt_requires_insufficient_evidence_and_forbids_fabrication():
 
     QAService(FakeRetriever([source("a.py", 1, 1, "code")]), llm).answer("demo", "where?")
 
-    prompt = llm.prompts[0].lower()
-    assert "insufficient evidence" in prompt
-    assert "do not fabricate" in prompt
+    prompt = llm.prompts[0]
+    assert "未在当前代码库中找到足够依据。" in prompt
+    assert "仅使用提供的代码上下文" in prompt
+    assert "不得编造事实" in prompt
 
 
 def test_answer_applies_context_limit_before_adding_each_source():
@@ -124,6 +125,12 @@ def test_answer_returns_insufficient_evidence_without_calling_llm():
     assert result.answer == INSUFFICIENT_EVIDENCE_MESSAGE
     assert result.sources == []
     assert llm.prompts == []
+
+
+def test_answer_uses_confirmed_chinese_insufficient_evidence_message():
+    result = QAService(FakeRetriever([]), FakeLLM("unused")).answer("demo", "where?")
+
+    assert result.answer == "未在当前代码库中找到足够依据。"
 
 
 def test_mock_mode_constructs_mock_clients_only_when_explicitly_selected():
@@ -209,6 +216,7 @@ def test_chat_endpoint_returns_answer_and_exact_sources():
 @pytest.mark.parametrize(
     ("payload", "field"),
     [
+        ({"project_id": "   ", "question": "entry?"}, "project_id"),
         ({"project_id": "demo", "question": "   "}, "question"),
         ({"project_id": "demo", "question": "entry?", "top_k": 0}, "top_k"),
     ],

@@ -12,12 +12,12 @@ class ChatRequest(BaseModel):
     question: str
     top_k: int = Field(default=5, ge=1)
 
-    @field_validator("question")
+    @field_validator("project_id", "question")
     @classmethod
-    def question_must_not_be_blank(cls, value: str) -> str:
+    def required_text_must_not_be_blank(cls, value: str) -> str:
         value = value.strip()
         if not value:
-            raise ValueError("question must not be blank")
+            raise ValueError("value must not be blank")
         return value
 
 

@@ -1,7 +1,7 @@
 from .models import LLMClient, QAResult, Retriever, SourceChunk
 
 
-INSUFFICIENT_EVIDENCE_MESSAGE = "Insufficient evidence in the indexed project to answer this question."
+INSUFFICIENT_EVIDENCE_MESSAGE = "未在当前代码库中找到足够依据。"
 
 
 class QAService:
@@ -43,8 +43,8 @@ class QAService:
             for item in sources
         )
         return (
-            "Answer the question using only the supplied code context. Do not fabricate facts. "
-            f"If the context is insufficient, respond exactly: {INSUFFICIENT_EVIDENCE_MESSAGE} "
-            "Cite source locations in your answer.\n\n"
-            f"Question: {question}\n\nCode context:\n{context}"
+            "仅使用提供的代码上下文回答问题，不得编造事实。"
+            f"如果上下文不足，请严格回复：{INSUFFICIENT_EVIDENCE_MESSAGE}"
+            "请在回答中标注引用的文件路径和行号。\n\n"
+            f"问题：{question}\n\n代码上下文：\n{context}"
         )
