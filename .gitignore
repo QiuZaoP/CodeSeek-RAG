@@ -7,7 +7,7 @@ data/
 chroma_db/
 node_modules/
 dist/
-docs/
+mydocs/
 frontend/.local-validation/
 frontend/coverage/
 frontend/playwright-report/

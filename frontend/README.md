@@ -62,6 +62,9 @@ npm run preview
 
 ## API 服务边界
 
+完整接口字段、错误语义、CORS、后端适配原则和合并验收清单见
+[`docs/FRONTEND_BACKEND_INTEGRATION.md`](../docs/FRONTEND_BACKEND_INTEGRATION.md)。
+
 页面和功能模块应从 `src/services/serviceFactory.ts` 使用 `projectService`、
 `indexService` 和 `chatService`，不得直接调用 `fetch`。服务层统一处理 JSON、超时、
 主动取消和后端错误，并通过环境变量在真实 API 与 Mock 间切换。
