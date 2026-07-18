@@ -56,7 +56,10 @@ class OpenAILLM:
             model=self._model,
             messages=[{"role": "user", "content": prompt}],
         )
-        content = response.choices[0].message.content
+        choices = getattr(response, "choices", None)
+        if not choices:
+            raise RuntimeError("The configured LLM response contained no choices.")
+        content = choices[0].message.content
         if not content:
             raise RuntimeError("The configured LLM returned an empty response.")
         return content

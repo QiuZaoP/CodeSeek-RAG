@@ -3,6 +3,7 @@ import pytest
 from backend.qa.adapters import (
     MockLLM,
     MockRetriever,
+    OpenAILLM,
     RealAdapterConfigurationError,
     create_clients,
 )
@@ -137,3 +138,19 @@ def test_real_mode_is_default_and_reports_missing_real_integration():
 def test_unknown_mode_is_rejected():
     with pytest.raises(ValueError, match="QA_MODE"):
         create_clients({"QA_MODE": "preview"})
+
+
+def test_openai_llm_reports_empty_choices_clearly():
+    class EmptyResponseClient:
+        class chat:
+            class completions:
+                @staticmethod
+                def create(**_kwargs):
+                    return type("Response", (), {"choices": []})()
+
+    llm = OpenAILLM.__new__(OpenAILLM)
+    llm._client = EmptyResponseClient()
+    llm._model = "test-model"
+
+    with pytest.raises(RuntimeError, match="no choices"):
+        llm.generate("question")
