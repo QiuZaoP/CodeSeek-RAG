@@ -1,5 +1,11 @@
 import pytest
 
+from backend.qa.adapters import (
+    MockLLM,
+    MockRetriever,
+    RealAdapterConfigurationError,
+    create_clients,
+)
 from backend.qa.models import SourceChunk
 from backend.qa.service import INSUFFICIENT_EVIDENCE_MESSAGE, QAService
 
@@ -114,3 +120,20 @@ def test_answer_returns_insufficient_evidence_without_calling_llm():
     assert result.answer == INSUFFICIENT_EVIDENCE_MESSAGE
     assert result.sources == []
     assert llm.prompts == []
+
+
+def test_mock_mode_constructs_mock_clients_only_when_explicitly_selected():
+    retriever, llm = create_clients({"QA_MODE": "mock"})
+
+    assert isinstance(retriever, MockRetriever)
+    assert isinstance(llm, MockLLM)
+
+
+def test_real_mode_is_default_and_reports_missing_real_integration():
+    with pytest.raises(RealAdapterConfigurationError, match="real retrieval"):
+        create_clients({})
+
+
+def test_unknown_mode_is_rejected():
+    with pytest.raises(ValueError, match="QA_MODE"):
+        create_clients({"QA_MODE": "preview"})
