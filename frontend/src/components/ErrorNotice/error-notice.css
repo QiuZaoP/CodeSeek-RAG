@@ -1,0 +1,31 @@
+.error-notice {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  color: var(--color-danger);
+  background: var(--color-danger-soft);
+  border: 1px solid var(--color-danger-border);
+  border-radius: var(--radius-panel);
+}
+
+.error-notice__icon {
+  width: 1.4rem;
+  height: 1.4rem;
+}
+
+.error-notice h2 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.error-notice__body {
+  margin-top: var(--space-1);
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.error-notice__action {
+  margin-top: var(--space-4);
+}

@@ -21,3 +21,17 @@
 pip install -r requirements.txt
 uvicorn backend.main:app --reload
 ```
+
+## 前端启动
+
+前端默认启用运行时 Mock，不依赖后端或 API Key 即可走通加载项目、建立索引、提问和
+查看引用的完整流程：
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+浏览器中的 `/guide` 页面提供操作步骤、Mock 演示场景和真实后端切换说明。完整环境
+变量、质量命令与接口约定见 [`frontend/README.md`](frontend/README.md)。

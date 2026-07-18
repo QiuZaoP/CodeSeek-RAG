@@ -1,0 +1,11 @@
+.workspace-page {
+  min-height: calc(100svh - var(--header-height));
+  display: grid;
+  grid-template-columns: minmax(20rem, var(--sidebar-width)) minmax(0, 1fr);
+}
+
+@media (max-width: 960px) {
+  .workspace-page {
+    display: block;
+  }
+}
