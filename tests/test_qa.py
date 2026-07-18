@@ -1,3 +1,5 @@
+import pytest
+
 from backend.qa.models import SourceChunk
 from backend.qa.service import INSUFFICIENT_EVIDENCE_MESSAGE, QAService
 
@@ -43,6 +45,41 @@ def test_answer_uses_top_k_deduplicated_sources_and_citations():
     assert retriever.calls == [("demo", "where?", 2)]
     assert "a.py:1-2" in llm.prompts[0]
     assert "b.py:3-4" in llm.prompts[0]
+
+
+def test_answer_limits_used_sources_to_top_k_when_retriever_returns_more():
+    retriever = FakeRetriever(
+        [
+            source("a.py", 1, 1, "one"),
+            source("b.py", 1, 1, "two"),
+            source("c.py", 1, 1, "three"),
+        ]
+    )
+    llm = FakeLLM("grounded answer")
+
+    result = QAService(retriever, llm).answer("demo", "where?", top_k=2)
+
+    assert [item.file_path for item in result.sources] == ["a.py", "b.py"]
+    assert "a.py:1-1" in llm.prompts[0]
+    assert "b.py:1-1" in llm.prompts[0]
+    assert "c.py:1-1" not in llm.prompts[0]
+
+
+def test_answer_rejects_non_positive_top_k():
+    service = QAService(FakeRetriever([]), FakeLLM("unused"))
+
+    with pytest.raises(ValueError, match="top_k"):
+        service.answer("demo", "where?", top_k=0)
+
+
+def test_answer_prompt_requires_insufficient_evidence_and_forbids_fabrication():
+    llm = FakeLLM("grounded answer")
+
+    QAService(FakeRetriever([source("a.py", 1, 1, "code")]), llm).answer("demo", "where?")
+
+    prompt = llm.prompts[0].lower()
+    assert "insufficient evidence" in prompt
+    assert "do not fabricate" in prompt
 
 
 def test_answer_applies_context_limit_before_adding_each_source():

@@ -11,12 +11,14 @@ class QAService:
         self._context_limit = context_limit
 
     def answer(self, project_id: str, question: str, top_k: int = 5) -> QAResult:
-        sources = self._usable_sources(self._retriever.search(project_id, question, top_k))
+        if top_k < 1:
+            raise ValueError("top_k must be positive")
+        sources = self._usable_sources(self._retriever.search(project_id, question, top_k), top_k)
         if not sources:
             return QAResult(answer=INSUFFICIENT_EVIDENCE_MESSAGE, sources=[])
         return QAResult(answer=self._llm.generate(self._build_prompt(question, sources)), sources=sources)
 
-    def _usable_sources(self, retrieved: list[SourceChunk]) -> list[SourceChunk]:
+    def _usable_sources(self, retrieved: list[SourceChunk], top_k: int) -> list[SourceChunk]:
         seen: set[tuple[str, int, int, str]] = set()
         sources: list[SourceChunk] = []
         context_size = 0
@@ -29,16 +31,20 @@ class QAService:
                 continue
             sources.append(item)
             context_size += len(item.content)
+            if len(sources) == top_k:
+                break
         return sources
 
     @staticmethod
     def _build_prompt(question: str, sources: list[SourceChunk]) -> str:
         context = "\n\n".join(
-            f"[{item.file_path}:{item.start_line}-{item.end_line}]\n{item.content}"
+            f"[BEGIN SOURCE {item.file_path}:{item.start_line}-{item.end_line}]\n"
+            f"{item.content}\n[END SOURCE]"
             for item in sources
         )
         return (
-            "Answer the question using only the supplied code context. "
+            "Answer the question using only the supplied code context. Do not fabricate facts. "
+            f"If the context is insufficient, respond exactly: {INSUFFICIENT_EVIDENCE_MESSAGE} "
             "Cite source locations in your answer.\n\n"
             f"Question: {question}\n\nCode context:\n{context}"
         )
