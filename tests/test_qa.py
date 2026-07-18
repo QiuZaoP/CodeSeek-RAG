@@ -154,3 +154,19 @@ def test_openai_llm_reports_empty_choices_clearly():
 
     with pytest.raises(RuntimeError, match="no choices"):
         llm.generate("question")
+
+
+def test_openai_llm_reports_missing_choices_clearly():
+    class MissingChoicesResponseClient:
+        class chat:
+            class completions:
+                @staticmethod
+                def create(**_kwargs):
+                    return object()
+
+    llm = OpenAILLM.__new__(OpenAILLM)
+    llm._client = MissingChoicesResponseClient()
+    llm._model = "test-model"
+
+    with pytest.raises(RuntimeError, match="no choices"):
+        llm.generate("question")
