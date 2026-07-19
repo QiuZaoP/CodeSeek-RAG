@@ -1,4 +1,3 @@
-import { CheckIcon } from '@/components/Icon/Icon'
 import { IndexStatus } from '@/features/index/IndexStatus'
 import type { IndexWorkflowState } from '@/features/index/useIndexWorkflow'
 import { ProjectPathForm } from '@/features/project/ProjectPathForm'
@@ -59,12 +58,8 @@ export function ProjectPanel({
           className={`workflow-step ${hasIndex ? 'workflow-step--complete' : hasProject ? 'workflow-step--current' : 'workflow-step--inactive'}`}
           aria-current={hasProject && !hasIndex ? 'step' : undefined}
         >
-          <div
-            className={`workflow-step__marker ${hasIndex ? 'workflow-step__marker--check' : ''}`}
-            aria-label={hasIndex ? '已完成' : undefined}
-            aria-hidden={hasIndex ? undefined : true}
-          >
-            {hasIndex ? <CheckIcon /> : 2}
+          <div className="workflow-step__marker" aria-hidden="true">
+            2
           </div>
           <div className="workflow-step__body">
             <h2>建立索引</h2>

@@ -1,19 +1,10 @@
 import { ChatWorkspace } from '@/features/chat/ChatWorkspace'
-import { useChatWorkflow } from '@/features/chat/useChatWorkflow'
-import { useIndexWorkflow } from '@/features/index/useIndexWorkflow'
 import { ProjectPanel } from '@/features/project/ProjectPanel'
-import { useProjectWorkflow } from '@/features/project/useProjectWorkflow'
+import { useWorkspaceSession } from '@/features/workspace/useWorkspaceSession'
 import '@/pages/workspace-page.css'
 
 export function WorkspacePage() {
-  const chatWorkflow = useChatWorkflow()
-  const indexWorkflow = useIndexWorkflow({ onBuildStart: chatWorkflow.reset })
-  const projectWorkflow = useProjectWorkflow({
-    onProjectChanging: () => {
-      indexWorkflow.reset()
-      chatWorkflow.reset()
-    },
-  })
+  const { chatWorkflow, indexWorkflow, projectWorkflow } = useWorkspaceSession()
   const isChatEnabled = indexWorkflow.state.status === 'completed'
 
   return (
@@ -36,6 +27,7 @@ export function WorkspacePage() {
         isEnabled={isChatEnabled}
         questionInput={chatWorkflow.questionInput}
         state={chatWorkflow.state}
+        onClearConversation={chatWorkflow.reset}
         onQuestionInputChange={chatWorkflow.setQuestionInput}
         onQuestionSubmit={() => {
           if (projectWorkflow.project) {
@@ -43,10 +35,10 @@ export function WorkspacePage() {
           }
         }}
         onRetry={() => {
-          if (projectWorkflow.project && chatWorkflow.state.question) {
+          if (projectWorkflow.project && chatWorkflow.state.pendingQuestion) {
             void chatWorkflow.askQuestion(
               projectWorkflow.project.project_id,
-              chatWorkflow.state.question,
+              chatWorkflow.state.pendingQuestion,
             )
           }
         }}

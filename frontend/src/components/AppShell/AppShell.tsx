@@ -1,6 +1,7 @@
 import { Outlet } from 'react-router-dom'
 
 import { AppHeader } from '@/components/AppHeader/AppHeader'
+import { WorkspaceSessionProvider } from '@/features/workspace/WorkspaceSessionProvider'
 import '@/components/AppShell/app-shell.css'
 
 export function AppShell() {
@@ -10,7 +11,9 @@ export function AppShell() {
         跳到主要内容
       </a>
       <AppHeader />
-      <Outlet />
+      <WorkspaceSessionProvider>
+        <Outlet />
+      </WorkspaceSessionProvider>
     </div>
   )
 }

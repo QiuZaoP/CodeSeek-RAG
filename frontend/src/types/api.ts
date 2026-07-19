@@ -37,6 +37,12 @@ export interface AskQuestionRequest {
   project_id: string
   question: string
   top_k?: number
+  history?: ChatHistoryTurn[]
+}
+
+export interface ChatHistoryTurn {
+  question: string
+  answer: string
 }
 
 export interface SourceCitation {

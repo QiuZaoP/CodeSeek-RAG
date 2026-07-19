@@ -1,11 +1,15 @@
 .workspace-page {
+  height: calc(100svh - var(--header-height));
   min-height: calc(100svh - var(--header-height));
   display: grid;
   grid-template-columns: minmax(20rem, var(--sidebar-width)) minmax(0, 1fr);
+  overflow: hidden;
 }
 
 @media (max-width: 960px) {
   .workspace-page {
+    height: auto;
     display: block;
+    overflow: visible;
   }
 }

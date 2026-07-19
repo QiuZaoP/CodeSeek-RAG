@@ -1,23 +1,31 @@
 import { useEffect, useRef, useState } from 'react'
 
 import { chatService } from '@/services/serviceFactory'
-import type { ChatResponse } from '@/types/api'
+import type { ChatHistoryTurn, ChatResponse } from '@/types/api'
 import { AppError, isAppError } from '@/types/errors'
 
 export type ChatStatus = 'idle' | 'loading' | 'success' | 'error'
 
+export interface ChatTurn extends ChatHistoryTurn {
+  response: ChatResponse
+}
+
 export interface ChatWorkflowState {
   status: ChatStatus
-  question?: string
-  response?: ChatResponse
+  turns: ChatTurn[]
+  pendingQuestion?: string
   error?: AppError
 }
 
-const INITIAL_STATE: ChatWorkflowState = { status: 'idle' }
+const MAX_CONTEXT_TURNS = 8
+
+function createInitialState(): ChatWorkflowState {
+  return { status: 'idle', turns: [] }
+}
 
 export function useChatWorkflow() {
   const [questionInput, setQuestionInput] = useState('')
-  const [state, setState] = useState<ChatWorkflowState>(INITIAL_STATE)
+  const [state, setState] = useState<ChatWorkflowState>(createInitialState)
   const activeController = useRef<AbortController | null>(null)
   const isAnswering = useRef(false)
 
@@ -34,7 +42,7 @@ export function useChatWorkflow() {
   function reset() {
     cancelRequest()
     setQuestionInput('')
-    setState(INITIAL_STATE)
+    setState(createInitialState())
   }
 
   async function askQuestion(projectId: string, questionOverride?: string) {
@@ -48,11 +56,16 @@ export function useChatWorkflow() {
     activeController.current = controller
     isAnswering.current = true
     setQuestionInput('')
-    setState({ status: 'loading', question })
+    const turns = state.turns
+    const history = turns.slice(-MAX_CONTEXT_TURNS).map(({ question: previousQuestion, answer }) => ({
+      question: previousQuestion,
+      answer,
+    }))
+    setState({ status: 'loading', turns, pendingQuestion: question })
 
     try {
       const response = await chatService.askQuestion(
-        { project_id: projectId, question, top_k: 5 },
+        { project_id: projectId, question, top_k: 5, history },
         { signal: controller.signal },
       )
       if (activeController.current !== controller) {
@@ -60,16 +73,23 @@ export function useChatWorkflow() {
       }
       activeController.current = null
       isAnswering.current = false
-      setState({ status: 'success', question, response })
+      setState((current) => ({
+        status: 'success',
+        turns: [
+          ...current.turns,
+          { question, answer: response.answer, response },
+        ],
+      }))
     } catch (caughtError) {
       if (controller.signal.aborted || activeController.current !== controller) {
         return
       }
       activeController.current = null
       isAnswering.current = false
-      setState({
+      setState((current) => ({
         status: 'error',
-        question,
+        turns: current.turns,
+        pendingQuestion: question,
         error: isAppError(caughtError)
           ? caughtError
           : new AppError('问答服务发生未知错误，请重试。', {
@@ -77,7 +97,7 @@ export function useChatWorkflow() {
               retryable: true,
               cause: caughtError,
             }),
-      })
+      }))
     }
   }
 

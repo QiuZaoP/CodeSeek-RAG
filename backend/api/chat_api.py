@@ -4,13 +4,28 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field, field_validator
 
 from backend.qa.adapters import RealAdapterConfigurationError
+from backend.qa.models import ConversationTurn
 from backend.qa.service import QAService
+
+
+class ConversationTurnRequest(BaseModel):
+    question: str = Field(max_length=4_000)
+    answer: str = Field(max_length=20_000)
+
+    @field_validator("question", "answer")
+    @classmethod
+    def required_text_must_not_be_blank(cls, value: str) -> str:
+        value = value.strip()
+        if not value:
+            raise ValueError("value must not be blank")
+        return value
 
 
 class ChatRequest(BaseModel):
     project_id: str
-    question: str
+    question: str = Field(max_length=4_000)
     top_k: int = Field(default=5, ge=1)
+    history: list[ConversationTurnRequest] = Field(default_factory=list, max_length=8)
 
     @field_validator("project_id", "question")
     @classmethod
@@ -41,7 +56,15 @@ def create_chat_router(service: QAService) -> APIRouter:
     @router.post("/api/chat", response_model=ChatResponse)
     def chat(request: ChatRequest) -> ChatResponse:
         try:
-            result = service.answer(request.project_id, request.question, request.top_k)
+            result = service.answer(
+                request.project_id,
+                request.question,
+                request.top_k,
+                history=[
+                    ConversationTurn(question=item.question, answer=item.answer)
+                    for item in request.history
+                ],
+            )
         except RealAdapterConfigurationError as error:
             raise HTTPException(
                 status_code=503,

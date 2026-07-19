@@ -11,6 +11,7 @@ pytest-cache-files-*/
 .env
 data/
 chroma_db/
+models/
 node_modules/
 dist/
 mydocs/

@@ -9,7 +9,7 @@ from backend.qa.adapters import (
     RealAdapterConfigurationError,
     create_clients,
 )
-from backend.qa.models import SourceChunk
+from backend.qa.models import ConversationTurn, SourceChunk
 from backend.qa.service import INSUFFICIENT_EVIDENCE_MESSAGE, QAService
 from backend.api.chat_api import create_chat_router
 
@@ -55,6 +55,41 @@ def test_answer_uses_top_k_deduplicated_sources_and_citations():
     assert retriever.calls == [("demo", "where?", 2)]
     assert "a.py:1-2" in llm.prompts[0]
     assert "b.py:3-4" in llm.prompts[0]
+
+
+def test_answer_uses_recent_conversation_for_retrieval_and_prompt():
+    retriever = FakeRetriever([source("backend/main.py", 1, 2, "app = FastAPI()")])
+    llm = FakeLLM("It is created in backend/main.py.")
+    history = [
+        ConversationTurn(
+            question="Where is the backend entry point?",
+            answer="The entry point is backend/main.py.",
+        )
+    ]
+
+    QAService(retriever, llm).answer(
+        "demo", "How is it created?", history=history
+    )
+
+    retrieval_question = retriever.calls[0][1]
+    assert "Where is the backend entry point?" in retrieval_question
+    assert "backend/main.py" in retrieval_question
+    assert retrieval_question.endswith("用户当前问题：How is it created?")
+    assert "对话历史（仅用于理解指代和追问，不作为代码事实依据）" in llm.prompts[0]
+    assert "当前问题：How is it created?" in llm.prompts[0]
+
+
+def test_answer_limits_conversation_to_eight_most_recent_turns():
+    retriever = FakeRetriever([source("a.py", 1, 1, "code")])
+    history = [ConversationTurn(f"question-{index}", f"answer-{index}") for index in range(10)]
+
+    QAService(retriever, FakeLLM("answer")).answer("demo", "follow-up", history=history)
+
+    retrieval_question = retriever.calls[0][1]
+    assert "question-0" not in retrieval_question
+    assert "question-1" not in retrieval_question
+    assert "question-2" in retrieval_question
+    assert "question-9" in retrieval_question
 
 
 def test_answer_limits_used_sources_to_top_k_when_retriever_returns_more():
@@ -234,6 +269,42 @@ def test_chat_endpoint_returns_answer_and_exact_sources():
             }
         ],
     }
+
+
+def test_chat_endpoint_accepts_current_session_history():
+    retriever = FakeRetriever([source("src/main.py", 1, 1, "app = FastAPI()")])
+    llm = FakeLLM("It creates the FastAPI application.")
+    response = make_client(QAService(retriever, llm)).post(
+        "/api/chat",
+        json={
+            "project_id": "demo",
+            "question": "How is it created?",
+            "history": [
+                {
+                    "question": "Where is the entry point?",
+                    "answer": "It is src/main.py.",
+                }
+            ],
+        },
+    )
+
+    assert response.status_code == 200
+    assert "Where is the entry point?" in retriever.calls[0][1]
+    assert "It is src/main.py." in llm.prompts[0]
+
+
+def test_chat_endpoint_rejects_blank_history_turn():
+    response = make_client(QAService(FakeRetriever([]), FakeLLM("unused"))).post(
+        "/api/chat",
+        json={
+            "project_id": "demo",
+            "question": "entry?",
+            "history": [{"question": "   ", "answer": "previous answer"}],
+        },
+    )
+
+    assert response.status_code == 422
+    assert response.json()["detail"][0]["loc"][-1] == "question"
 
 
 @pytest.mark.parametrize(

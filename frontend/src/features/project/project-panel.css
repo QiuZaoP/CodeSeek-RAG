@@ -1,8 +1,12 @@
 .project-panel {
+  height: calc(100svh - var(--header-height));
   min-width: 0;
   padding: var(--space-10) var(--space-8);
   background: var(--color-surface-subtle);
   border-right: 1px solid var(--color-border);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
 }
 
 .workflow-steps {
@@ -30,14 +34,7 @@
   background: var(--color-border);
 }
 
-.workflow-step--complete:not(:last-child)::before {
-  content: '';
-  position: absolute;
-  z-index: 1;
-  top: 2.5rem;
-  left: calc(1.25rem - 0.5px);
-  width: 1px;
-  height: 2.25rem;
+.workflow-step--complete:not(:last-child)::after {
   background: var(--color-primary);
 }
 
@@ -48,23 +45,18 @@
   height: 2.5rem;
   display: grid;
   place-items: center;
-  color: #ffffff;
-  background: var(--color-primary);
+  color: var(--color-text-muted);
+  background: var(--color-border-subtle);
   border-radius: 50%;
   font-size: 1rem;
   font-weight: 750;
   box-shadow: 0 0 0 5px var(--color-surface-subtle);
 }
 
-.workflow-step__marker--check svg {
-  width: 1.4rem;
-  height: 1.4rem;
-}
-
-.workflow-step--inactive .workflow-step__marker {
-  color: var(--color-text-muted);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
+.workflow-step--current .workflow-step__marker,
+.workflow-step--complete .workflow-step__marker {
+  color: #ffffff;
+  background: var(--color-primary);
 }
 
 .workflow-step__body {
@@ -196,9 +188,11 @@
 
 @media (max-width: 960px) {
   .project-panel {
+    height: auto;
     padding: var(--space-8);
     border-right: 0;
     border-bottom: 1px solid var(--color-border);
+    overflow: visible;
   }
 
   .workflow-steps {
@@ -218,11 +212,6 @@
   }
 
   .workflow-step:not(:last-child)::after {
-    top: 2.25rem;
-    left: calc(1.125rem - 0.5px);
-  }
-
-  .workflow-step--complete:not(:last-child)::before {
     top: 2.25rem;
     left: calc(1.125rem - 0.5px);
   }

@@ -41,7 +41,7 @@ class FakeIndexer:
 
 
 class FakeQA:
-    def answer(self, _project_id, _question, _top_k):
+    def answer(self, _project_id, _question, _top_k, history=None):
         return QAResult(
             answer="test answer",
             sources=[SourceChunk("src/main.py", 1, 2, "print('ok')")],

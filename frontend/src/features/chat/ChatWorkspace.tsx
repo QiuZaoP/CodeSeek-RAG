@@ -7,7 +7,7 @@ import { StatusMessage } from '@/components/StatusMessage/StatusMessage'
 import { DEMO_QUESTIONS } from '@/features/chat/demoQuestions'
 import { QuestionComposer } from '@/features/chat/QuestionComposer'
 import { SourceCitationList } from '@/features/chat/SourceCitationList'
-import type { ChatWorkflowState } from '@/features/chat/useChatWorkflow'
+import type { ChatTurn, ChatWorkflowState } from '@/features/chat/useChatWorkflow'
 import '@/features/chat/chat-workspace.css'
 
 interface ChatWorkspaceProps {
@@ -17,70 +17,107 @@ interface ChatWorkspaceProps {
   onQuestionInputChange: (value: string) => void
   onQuestionSubmit: () => void
   onRetry: () => void
+  onClearConversation: () => void
+}
+
+function CompletedTurn({ turn }: { turn: ChatTurn }) {
+  return (
+    <>
+      <article className="message message--user">
+        <div className="message__avatar message__avatar--user" aria-hidden="true">
+          <UserIcon />
+        </div>
+        <p>{turn.question}</p>
+      </article>
+
+      <article className="message message--assistant">
+        <div className="message__avatar message__avatar--assistant" aria-hidden="true">
+          <BotIcon />
+        </div>
+        <div className="message__body">
+          <p className="message__answer">{turn.response.answer}</p>
+          {turn.response.sources.length > 0 ? (
+            <SourceCitationList sources={turn.response.sources} />
+          ) : (
+            <div className="no-sources-notice">
+              <StatusMessage>当前回答没有可用引用，请谨慎核对。</StatusMessage>
+            </div>
+          )}
+        </div>
+      </article>
+    </>
+  )
 }
 
 export function ChatWorkspace({
   isEnabled,
+  onClearConversation,
   onQuestionInputChange,
   onQuestionSubmit,
   onRetry,
   questionInput,
   state,
 }: ChatWorkspaceProps) {
-  const hasConversation = state.status !== 'idle' && state.question
+  const hasConversation = state.turns.length > 0 || Boolean(state.pendingQuestion)
   const isLoading = state.status === 'loading'
 
   return (
     <main className="chat-workspace" id="main-content" tabIndex={-1}>
       <div className="chat-workspace__content">
-        <h1>询问你的代码库</h1>
+        <div className="chat-workspace__heading">
+          <div>
+            <h1>询问你的代码库</h1>
+            <p>对话仅保留在当前页面会话中，不会长期保存。</p>
+          </div>
+          {hasConversation ? (
+            <Button type="button" variant="secondary" onClick={onClearConversation}>
+              清空对话
+            </Button>
+          ) : null}
+        </div>
 
         {hasConversation ? (
           <section className="conversation" aria-label="代码库问答" aria-busy={isLoading}>
-            <article className="message message--user">
-              <div className="message__avatar message__avatar--user" aria-hidden="true">
-                <UserIcon />
-              </div>
-              <p>{state.question}</p>
-            </article>
+            {state.turns.map((turn, index) => (
+              <CompletedTurn key={`${index}-${turn.question}`} turn={turn} />
+            ))}
 
-            <article className="message message--assistant">
-              <div className="message__avatar message__avatar--assistant" aria-hidden="true">
-                <BotIcon />
-              </div>
-              <div className="message__body">
-                {state.status === 'loading' ? (
-                  <div className="answer-loading">
-                    <LoadingIndicator label="正在回答…" />
-                    <span>正在检索代码并组织回答…</span>
+            {state.pendingQuestion ? (
+              <>
+                <article className="message message--user">
+                  <div className="message__avatar message__avatar--user" aria-hidden="true">
+                    <UserIcon />
                   </div>
-                ) : null}
-                {state.status === 'error' ? (
-                  <ErrorNotice
-                    title="问答失败"
-                    action={state.error?.retryable ? (
-                      <Button type="button" variant="secondary" onClick={onRetry}>
-                        重试问题
-                      </Button>
-                    ) : undefined}
-                  >
-                    {state.error?.message ?? '问答服务发生未知错误。'}
-                  </ErrorNotice>
-                ) : null}
-                {state.status === 'success' && state.response ? (
-                  <>
-                    <p className="message__answer">{state.response.answer}</p>
-                    {state.response.sources.length > 0 ? (
-                      <SourceCitationList sources={state.response.sources} />
-                    ) : (
-                      <div className="no-sources-notice">
-                        <StatusMessage>当前回答没有可用引用，请谨慎核对。</StatusMessage>
+                  <p>{state.pendingQuestion}</p>
+                </article>
+
+                <article className="message message--assistant">
+                  <div className="message__avatar message__avatar--assistant" aria-hidden="true">
+                    <BotIcon />
+                  </div>
+                  <div className="message__body">
+                    {state.status === 'loading' ? (
+                      <div className="answer-loading">
+                        <LoadingIndicator label="正在回答…" />
+                        <span>正在结合本轮对话检索代码并组织回答…</span>
                       </div>
-                    )}
-                  </>
-                ) : null}
-              </div>
-            </article>
+                    ) : null}
+                    {state.status === 'error' ? (
+                      <ErrorNotice
+                        title="问答失败"
+                        action={state.error?.retryable ? (
+                          <Button type="button" variant="secondary" onClick={onRetry}>
+                            重试问题
+                          </Button>
+                        ) : undefined}
+                      >
+                        {state.error?.message ?? '问答服务发生未知错误。'}
+                      </ErrorNotice>
+                    ) : null}
+                  </div>
+                </article>
+              </>
+            ) : null}
           </section>
         ) : (
           <EmptyState

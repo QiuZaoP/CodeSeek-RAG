@@ -13,6 +13,14 @@ class SourceChunk:
 
 
 @dataclass(frozen=True)
+class ConversationTurn:
+    """One completed user/assistant exchange supplied by the current client session."""
+
+    question: str
+    answer: str
+
+
+@dataclass(frozen=True)
 class QAResult:
     answer: str
     sources: list[SourceChunk]
